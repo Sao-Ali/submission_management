@@ -15,20 +15,24 @@ module.exports = async (req, res) => {
     if (err) return res.status(500).send("File upload error.");
     if (!req.file) return res.status(400).send("No file uploaded.");
 
-    // Save uploaded file in /tmp/ (Vercel allows writing here)
+    // Save the uploaded file in /tmp/ (Vercel allows writing here)
     const filePath = `/tmp/${req.file.originalname}`;
     fs.writeFileSync(filePath, req.file.buffer);
 
-    // Ensure backend.sh is in the correct location
+    // Define correct paths for backend.sh and checksum
     const scriptPath = "/tmp/backend.sh";
-    const originalScriptPath = path.join(__dirname, "backend.sh"); // Corrected reference
+    const checksumPath = "/tmp/checksum";
+    const originalScriptPath = path.join(__dirname, "backend.sh");
+    const originalChecksumPath = path.join(__dirname, "checksum");
 
-    // Copy backend.sh to /tmp/ before execution
+    // Copy backend.sh and checksum to /tmp/ before execution
     try {
       fs.copyFileSync(originalScriptPath, scriptPath);
-      fs.chmodSync(scriptPath, "755"); // Ensure it's executable
+      fs.copyFileSync(originalChecksumPath, checksumPath);
+      fs.chmodSync(scriptPath, "755"); // Ensure backend.sh is executable
+      fs.chmodSync(checksumPath, "755"); // Ensure checksum is executable
     } catch (copyError) {
-      return res.status(500).send(`Error copying backend.sh: ${copyError.message}`);
+      return res.status(500).send(`Error copying backend.sh or checksum: ${copyError.message}`);
     }
 
     // Execute backend.sh on the uploaded file
