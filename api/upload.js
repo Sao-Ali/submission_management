@@ -15,13 +15,13 @@ module.exports = async (req, res) => {
     if (err) return res.status(500).send("File upload error.");
     if (!req.file) return res.status(400).send("No file uploaded.");
 
-    // Save the uploaded file to Vercel's temporary directory
+    // Save uploaded file in /tmp/ (Vercel allows writing here)
     const filePath = `/tmp/${req.file.originalname}`;
     fs.writeFileSync(filePath, req.file.buffer);
 
-    // Ensure backend.sh is copied to a valid location (/tmp/)
-    const scriptPath = path.join(__dirname, "backend.sh");
-
+    // Ensure backend.sh is in the correct location
+    const scriptPath = "/tmp/backend.sh";
+    const originalScriptPath = path.join(__dirname, "backend.sh"); // Corrected reference
 
     // Copy backend.sh to /tmp/ before execution
     try {
@@ -31,7 +31,7 @@ module.exports = async (req, res) => {
       return res.status(500).send(`Error copying backend.sh: ${copyError.message}`);
     }
 
-    // Execute the backend script
+    // Execute backend.sh on the uploaded file
     exec(`bash ${scriptPath} ${filePath}`, (error, stdout, stderr) => {
       if (error) return res.status(500).send(`Script Error: ${stderr}`);
       res.setHeader("Content-Type", "text/plain");
