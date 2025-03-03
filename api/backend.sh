@@ -29,6 +29,13 @@ TMPDIR=`mktemp -d /tmp/$BASENAME.XXXXXX`
 CHECKSUM_PATH="$(dirname "$0")/checksum"
 [ -x "$CHECKSUM_PATH" ] || die "expecting checksum executable to exist in script directory"
 
+CHECKSUM_SOURCE="$(dirname "$0")/checksum.c"
+if [ -f "$CHECKSUM_SOURCE" ]; then
+    echo "Checksum on checksum.c:"
+    "$CHECKSUM_PATH" < "$CHECKSUM_SOURCE"
+fi
+
+
 #[ -f ./checksum.c ] || die "expecting checksum.c source file in the current directory"
 PATH="$PATH:."
 export PATH
