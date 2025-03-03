@@ -54,6 +54,11 @@ else
     echo "ERROR: checksum executable not found or not executable"
 fi
 
+echo "Checking checksum binary:"
+ls -l "$CHECKSUM_PATH"
+file "$CHECKSUM_PATH"
+ldd "$CHECKSUM_PATH" || echo "ldd not available"
+
 
 echo "md5sum on input file:"
 md5sum "$1" | sed "s|$1|$(basename "$1")|"
