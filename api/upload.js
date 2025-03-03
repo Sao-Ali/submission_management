@@ -20,8 +20,9 @@ module.exports = async (req, res) => {
     fs.writeFileSync(filePath, req.file.buffer);
 
     // Execute the backend script
-    const scriptPath = path.join(__dirname, "../../backend.sh");  // Adjusted path for Vercel
+    const scriptPath = path.join(__dirname, "../../backend.sh");  // Adjust path to find backend.sh
     exec(`bash ${scriptPath} ${filePath}`, (error, stdout, stderr) => {
+
       if (error) return res.status(500).send(`Script Error: ${stderr}`);
       res.setHeader("Content-Type", "text/plain");
       return res.status(200).send(stdout);
