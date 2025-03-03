@@ -25,8 +25,8 @@ module.exports = async (req, res) => {
     const originalScriptPath = path.join(__dirname, "backend.sh");
     const originalChecksumPath = path.join(__dirname, "checksum");
 
-    // Copy backend.sh and checksum to /tmp/ before execution
     try {
+      // Copy backend.sh and checksum to /tmp/ before execution
       fs.copyFileSync(originalScriptPath, scriptPath);
       fs.copyFileSync(originalChecksumPath, checksumPath);
       fs.chmodSync(scriptPath, "755"); // Ensure backend.sh is executable
