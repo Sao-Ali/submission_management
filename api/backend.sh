@@ -36,12 +36,11 @@ export PATH
 echo Checksum on input file:
 "$CHECKSUM_PATH" < "$1"
 
-
 echo md5sum on input file:
-md5sum "$@"
+md5sum "$1" | sed "s|$1|$(basename "$1")|"
 
 echo Edges:
-wc -l "$@"
+wc -l "$1" | sed "s|$1|$(basename "$1")|"
 
 echo Nodes:
-cat "$@" | newlines | sort -u | wc -l
+cat "$1" | newlines | sort -u | wc -l
