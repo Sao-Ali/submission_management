@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>File Upload</title>
+</head>
+<body>
+    <h1>Upload a File</h1>
+    <form id="uploadForm">
+        <input type="file" id="fileInput" required>
+        <button type="submit">Upload & Run</button>
+    </form>
+    <h2>Output:</h2>
+    <pre id="output"></pre>
+
+    <script>
+        document.getElementById("uploadForm").addEventListener("submit", async (e) => {
+            e.preventDefault();
+            const file = document.getElementById("fileInput").files[0];
+            if (!file) return alert("Please select a file.");
+
+            const formData = new FormData();
+            formData.append("file", file);
+
+            const res = await fetch("/upload", { method: "POST", body: formData });
+            const text = await res.text();
+            document.getElementById("output").innerText = text;
+        });
+    </script>
+</body>
+</html>
+
