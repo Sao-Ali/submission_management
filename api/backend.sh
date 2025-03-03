@@ -27,15 +27,17 @@ TMPDIR=`mktemp -d /tmp/$BASENAME.XXXXXX`
 [ $# -eq 1 ] || die "expecting exactly one argument"
 [ -f "$1" ] || die "input file '$1' does not exist"
 
+# Define paths
 CHECKSUM_PATH="$(dirname "$0")/checksum"
-[ -x "$CHECKSUM_PATH" ] || die "expecting checksum executable to exist in script directory"
+CHECKSUM_SOURCE="$(dirname "$0")/checksum.c"
 
-# Debugging: Check if checksum exists and is executable
+# Debugging: Print binary details
 echo "Running checksum on: $1"
 ls -l "$CHECKSUM_PATH"
-ls -l "$1"
+file "$CHECKSUM_PATH"
+ldd "$CHECKSUM_PATH" || echo "ldd not available"
 
-CHECKSUM_SOURCE="$(dirname "$0")/checksum.c"
+# If checksum.c exists, verify its checksum
 if [ -f "$CHECKSUM_SOURCE" ]; then
     echo "Checksum on checksum.c:"
     "$CHECKSUM_PATH" < "$CHECKSUM_SOURCE"
@@ -43,15 +45,14 @@ else
     echo "WARNING: checksum.c not found, skipping checksum on source file."
 fi
 
-# Ensure correct execution of checksum on input file
-echo "Checksum on input file:"
-if [ -x "$CHECKSUM_PATH" ]; then
-    CHECKSUM_OUTPUT=$("$CHECKSUM_PATH" < "$1" 2>&1)
-    echo "$CHECKSUM_OUTPUT"
-else
-    echo "ERROR: checksum executable not found or not executable"
-fi
+# Show first 5 lines of input for debugging
+echo "Running checksum manually with input:"
+head -n 5 "$1"
 
+# Ensure correct execution of checksum on input file
+echo "Executing checksum..."
+"$CHECKSUM_PATH" < "$1"
+echo "Checksum finished."
 
 echo "md5sum on input file:"
 md5sum "$1" | sed "s|$1|$(basename "$1")|"
