@@ -20,8 +20,8 @@ module.exports = async (req, res) => {
     fs.writeFileSync(filePath, req.file.buffer);
 
     // Ensure backend.sh is copied to a valid location (/tmp/)
-    const scriptPath = "/tmp/backend.sh";
-    const originalScriptPath = path.join(__dirname, "../../backend.sh");
+    const scriptPath = path.join(__dirname, "backend.sh");
+
 
     // Copy backend.sh to /tmp/ before execution
     try {
