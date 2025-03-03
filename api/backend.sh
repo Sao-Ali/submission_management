@@ -26,13 +26,15 @@ TMPDIR=`mktemp -d /tmp/$BASENAME.XXXXXX`
 
 [ $# -eq 1 ] || die "expecting exactly one argument"
 [ -f "$1" ] || die "input file '$1' does not exist"
-[ -x ./checksum ] || which checksum 2>/dev/null || die "expecting checksum executable to exist or be in PATH"
+CHECKSUM_PATH="$(dirname "$0")/checksum"
+[ -x "$CHECKSUM_PATH" ] || die "expecting checksum executable to exist in script directory"
+
 [ -f ./checksum.c ] || die "expecting checksum.c source file in the current directory"
 PATH="$PATH:."
 export PATH
 
 echo Checksum on checksum.c:
-checksum < checksum.c
+"$CHECKSUM_PATH" < "$(dirname "$0")/checksum.c"
 
 echo md5sum on input file:
 md5sum "$@"
