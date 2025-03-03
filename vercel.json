@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "builds": [
+  "ibuilds": [
     {
       "src": "api/upload.js",
       "use": "@vercel/node"
@@ -11,6 +11,7 @@
       "src": "/api/upload",
       "dest": "api/upload.js"
     }
-  ]
+  ],
+  "files": ["api/backend.sh", "api/checksum"]
 }
 
