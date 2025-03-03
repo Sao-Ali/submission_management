@@ -5,35 +5,36 @@ const path = require("path");
 const cors = require("cors");
 
 const app = express();
-const PORT = 3000;
+const PORT = process.env.PORT || 3000;
 
 app.use(cors());
-app.use(express.static("public"));
+app.use(express.json());
 
-// Set up the file upload handling
-const storage = multer.diskStorage({
-  destination: "./uploads/",
-  filename: (req, file, cb) => {
-    cb(null, file.originalname);
-  },
-});
+// Use memory storage instead of writing to disk
+const storage = multer.memoryStorage();
 const upload = multer({ storage });
 
-// Routing for file uploads
-app.post("/upload", upload.single("file"), (req, res) => {
+// File Upload Route
+app.post("/api/upload", upload.single("file"), (req, res) => {
   if (!req.file) return res.status(400).send("No file uploaded.");
 
-  const filePath = path.join(__dirname, "uploads", req.file.filename);
+  // Convert buffer data to a temporary file
+  const filePath = `/tmp/${req.file.originalname}`;
+  require("fs").writeFileSync(filePath, req.file.buffer);
 
-  // Runing the backend.sh on the uploaded file
+  // Run backend.sh with the uploaded file
   exec(`bash backend.sh ${filePath}`, (error, stdout, stderr) => {
     if (error) return res.status(500).send(stderr);
     res.send(`<pre>${stdout}</pre>`);
   });
 });
 
-// Start server
-app.listen(PORT, () => {
-  console.log(`Server running at http://localhost:${PORT}`);
-});
+// Start server locally
+if (process.env.NODE_ENV !== "production") {
+  app.listen(PORT, () => {
+    console.log(`Server running at http://localhost:${PORT}`);
+  });
+}
 
+// Export handler for Vercel
+module.exports = app;
