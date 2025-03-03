@@ -26,28 +26,36 @@ TMPDIR=`mktemp -d /tmp/$BASENAME.XXXXXX`
 
 [ $# -eq 1 ] || die "expecting exactly one argument"
 [ -f "$1" ] || die "input file '$1' does not exist"
+
 CHECKSUM_PATH="$(dirname "$0")/checksum"
 [ -x "$CHECKSUM_PATH" ] || die "expecting checksum executable to exist in script directory"
+
+# Debugging: Check if checksum exists and is executable
+echo "Running checksum on: $1"
+ls -l "$CHECKSUM_PATH"
+ls -l "$1"
 
 CHECKSUM_SOURCE="$(dirname "$0")/checksum.c"
 if [ -f "$CHECKSUM_SOURCE" ]; then
     echo "Checksum on checksum.c:"
     "$CHECKSUM_PATH" < "$CHECKSUM_SOURCE"
+else
+    echo "WARNING: checksum.c not found, skipping checksum on source file."
 fi
 
+# Ensure correct execution of checksum on input file
+echo "Checksum on input file:"
+if [ -x "$CHECKSUM_PATH" ]; then
+    "$CHECKSUM_PATH" < "$1"
+else
+    echo "ERROR: checksum executable not found or not executable"
+fi
 
-#[ -f ./checksum.c ] || die "expecting checksum.c source file in the current directory"
-PATH="$PATH:."
-export PATH
-
-echo Checksum on input file:
-"$CHECKSUM_PATH" < "$1"
-
-echo md5sum on input file:
+echo "md5sum on input file:"
 md5sum "$1" | sed "s|$1|$(basename "$1")|"
 
-echo Edges:
+echo "Edges:"
 wc -l "$1" | sed "s|$1|$(basename "$1")|"
 
-echo Nodes:
+echo "Nodes:"
 cat "$1" | newlines | sort -u | wc -l
