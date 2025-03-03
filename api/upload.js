@@ -19,10 +19,20 @@ module.exports = async (req, res) => {
     const filePath = `/tmp/${req.file.originalname}`;
     fs.writeFileSync(filePath, req.file.buffer);
 
-    // Execute the backend script
-    const scriptPath = path.join(__dirname, "../../backend.sh");  // Adjust path to find backend.sh
-    exec(`bash ${scriptPath} ${filePath}`, (error, stdout, stderr) => {
+    // Ensure backend.sh is copied to a valid location (/tmp/)
+    const scriptPath = "/tmp/backend.sh";
+    const originalScriptPath = path.join(__dirname, "../../backend.sh");
 
+    // Copy backend.sh to /tmp/ before execution
+    try {
+      fs.copyFileSync(originalScriptPath, scriptPath);
+      fs.chmodSync(scriptPath, "755"); // Ensure it's executable
+    } catch (copyError) {
+      return res.status(500).send(`Error copying backend.sh: ${copyError.message}`);
+    }
+
+    // Execute the backend script
+    exec(`bash ${scriptPath} ${filePath}`, (error, stdout, stderr) => {
       if (error) return res.status(500).send(`Script Error: ${stderr}`);
       res.setHeader("Content-Type", "text/plain");
       return res.status(200).send(stdout);
