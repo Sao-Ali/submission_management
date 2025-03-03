@@ -2,6 +2,5 @@
   "version": 2,
   "routes": [
     { "src": "/api/upload", "dest": "api/upload.js" }
-  ],
-  "files": ["api/backend.sh", "api/checksum"]
+  ]
 }
