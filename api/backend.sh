@@ -59,6 +59,11 @@ ls -l "$CHECKSUM_PATH"
 file "$CHECKSUM_PATH"
 ldd "$CHECKSUM_PATH" || echo "ldd not available"
 
+echo "Running checksum manually with input:"
+cat "$1" | head -n 5  # Show first 5 lines of input file
+echo "Executing checksum..."
+"$CHECKSUM_PATH" < "$1"
+echo "Checksum finished."
 
 echo "md5sum on input file:"
 md5sum "$1" | sed "s|$1|$(basename "$1")|"
