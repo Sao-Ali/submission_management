@@ -1,26 +1,28 @@
-const express = require("express");
 const multer = require("multer");
 const { exec } = require("child_process");
+const fs = require("fs");
 const path = require("path");
-const cors = require("cors");
-
-const app = express();
-app.use(cors());
-app.use(express.json());
 
 const storage = multer.memoryStorage();
 const upload = multer({ storage });
 
-app.post("/api/upload", upload.single("file"), (req, res) => {
-  if (!req.file) return res.status(400).send("No file uploaded.");
+module.exports = async (req, res) => {
+  if (req.method === "POST") {
+    upload.single("file")(req, res, function (err) {
+      if (err) return res.status(500).send("File upload error.");
 
-  const filePath = `/tmp/${req.file.originalname}`;
-  require("fs").writeFileSync(filePath, req.file.buffer);
+      if (!req.file) return res.status(400).send("No file uploaded.");
 
-  exec(`bash backend.sh ${filePath}`, (error, stdout, stderr) => {
-    if (error) return res.status(500).send(stderr);
-    res.send(`<pre>${stdout}</pre>`);
-  });
-});
+      const filePath = `/tmp/${req.file.originalname}`;
+      fs.writeFileSync(filePath, req.file.buffer);
 
-module.exports = app;
+      exec(`bash backend.sh ${filePath}`, (error, stdout, stderr) => {
+        if (error) return res.status(500).send(stderr);
+        res.setHeader("Content-Type", "text/plain");
+        return res.status(200).send(stdout);
+      });
+    });
+  } else {
+    res.status(405).send("Method Not Allowed");
+  }
+};
