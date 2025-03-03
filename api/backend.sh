@@ -34,6 +34,8 @@ CHECKSUM_PATH="$(dirname "$0")/checksum"
 echo "Running checksum on: $1"
 ls -l "$CHECKSUM_PATH"
 ls -l "$1"
+file "$CHECKSUM_PATH"
+ldd "$CHECKSUM_PATH" || echo "ldd not avaliable"
 
 CHECKSUM_SOURCE="$(dirname "$0")/checksum.c"
 if [ -f "$CHECKSUM_SOURCE" ]; then
