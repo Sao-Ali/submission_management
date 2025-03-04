@@ -31,30 +31,10 @@ TMPDIR=`mktemp -d /tmp/$BASENAME.XXXXXX`
 CHECKSUM_PATH="/var/task/api/checksum"
 CHECKSUM_SOURCE="/var/task/api/checksum.c"
 
-# Debugging: Print paths
-echo "Looking for checksum binary at: $CHECKSUM_PATH"
-echo "Looking for checksum.c at: $CHECKSUM_SOURCE"
-
-# Check if checksum binary exists
-if [ -f "$CHECKSUM_PATH" ]; then
-    echo "Running checksum on: $1"
-    ls -l "$CHECKSUM_PATH"
-else
-    echo "ERROR: checksum binary not found at $CHECKSUM_PATH"
-    exit 1
-fi
-
-# Verify checksum.c existence and readability
+# Run checksum on checksum.c if it exists
 if [ -f "$CHECKSUM_SOURCE" ]; then
-    if [ -r "$CHECKSUM_SOURCE" ]; then
-        echo "Checksum on checksum.c:"
-        "$CHECKSUM_PATH" < "$CHECKSUM_SOURCE"
-    else
-        echo "ERROR: checksum.c exists but is not readable."
-        exit 1
-    fi
-else
-    echo "WARNING: checksum.c not found, skipping checksum on source file."
+    echo "Checksum on checksum.c:"
+    "$CHECKSUM_PATH" < "$CHECKSUM_SOURCE"
 fi
 
 # Run md5sum on input file
