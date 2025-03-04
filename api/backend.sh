@@ -27,10 +27,9 @@ TMPDIR=`mktemp -d /tmp/$BASENAME.XXXXXX`
 [ $# -eq 1 ] || die "expecting exactly one argument"
 [ -f "$1" ] || die "input file '$1' does not exist"
 
-# Define paths
-SCRIPT_DIR="$(dirname "$0")"
-CHECKSUM_PATH="$SCRIPT_DIR/checksum"
-CHECKSUM_SOURCE="$SCRIPT_DIR/checksum.c"
+# Define paths manually to ensure they point to the api directory
+CHECKSUM_PATH="/var/task/api/checksum"
+CHECKSUM_SOURCE="/var/task/api/checksum.c"
 
 # Debugging: Print paths
 echo "Looking for checksum binary at: $CHECKSUM_PATH"
@@ -69,4 +68,3 @@ wc -l "$1" | sed "s|$1|$(basename "$1")|"
 # Count unique nodes (first and second column values)
 echo "Nodes:"
 awk '{print $1; print $2}' "$1" | sort -u | wc -l
-
