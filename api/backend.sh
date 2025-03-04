@@ -51,7 +51,7 @@ head -n 5 "$1"
 
 # Ensure correct execution of checksum on input file
 echo "Executing checksum..."
-"$CHECKSUM_PATH" < "$1"
+"$CHECKSUM_PATH"  "$1"
 echo "Checksum finished."
 
 echo "md5sum on input file:"
