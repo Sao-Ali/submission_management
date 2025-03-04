@@ -27,24 +27,19 @@ TMPDIR=`mktemp -d /tmp/$BASENAME.XXXXXX`
 [ $# -eq 1 ] || die "expecting exactly one argument"
 [ -f "$1" ] || die "input file '$1' does not exist"
 
-# Define paths manually to ensure they point to the api directory
 CHECKSUM_PATH="/var/task/api/checksum"
 CHECKSUM_SOURCE="/var/task/api/checksum.c"
 
-# Run checksum on checksum.c if it exists
 if [ -f "$CHECKSUM_SOURCE" ]; then
     echo "Checksum on checksum.c:"
     "$CHECKSUM_PATH" < "$CHECKSUM_SOURCE"
 fi
 
-# Run md5sum on input file
 echo "md5sum on input file:"
 md5sum "$1" | sed "s|$1|$(basename "$1")|"
 
-# Count edges (number of lines in input file)
 echo "Edges:"
 wc -l "$1" | sed "s|$1|$(basename "$1")|"
 
-# Count unique nodes (first and second column values)
 echo "Nodes:"
 awk '{print $1; print $2}' "$1" | sort -u | wc -l
