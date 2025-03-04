@@ -31,35 +31,25 @@ TMPDIR=`mktemp -d /tmp/$BASENAME.XXXXXX`
 CHECKSUM_PATH="$(dirname "$0")/checksum"
 CHECKSUM_SOURCE="$(dirname "$0")/checksum.c"
 
-# Debugging: Print binary details
+# Run checksum on input file
 echo "Running checksum on: $1"
 ls -l "$CHECKSUM_PATH"
-file "$CHECKSUM_PATH"
-ldd "$CHECKSUM_PATH" || echo "ldd not available"
 
 # If checksum.c exists, verify its checksum
 if [ -f "$CHECKSUM_SOURCE" ]; then
     echo "Checksum on checksum.c:"
     "$CHECKSUM_PATH" < "$CHECKSUM_SOURCE"
-else
-    echo "WARNING: checksum.c not found, skipping checksum on source file."
 fi
 
-# Show first 5 lines of input for debugging
-echo "Running checksum manually with input:"
-head -n 5 "$1"
-
-# Ensure correct execution of checksum on input file
-echo "Executing checksum..."
-"$CHECKSUM_PATH" <  "$1"
-
-echo "Checksum finished."
-
+# Run checksum on input file
 echo "md5sum on input file:"
 md5sum "$1" | sed "s|$1|$(basename "$1")|"
 
+# Count edges
 echo "Edges:"
 wc -l "$1" | sed "s|$1|$(basename "$1")|"
 
+# Count unique nodes
 echo "Nodes:"
-cat "$1" | newlines | sort -u | wc -l
+awk '{print $1; print $2}' "$1" | sort -u | wc -l
+
