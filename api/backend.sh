@@ -28,28 +28,45 @@ TMPDIR=`mktemp -d /tmp/$BASENAME.XXXXXX`
 [ -f "$1" ] || die "input file '$1' does not exist"
 
 # Define paths
-CHECKSUM_PATH="$(dirname "$0")/checksum"
-CHECKSUM_SOURCE="$(dirname "$0")/checksum.c"
+SCRIPT_DIR="$(dirname "$0")"
+CHECKSUM_PATH="$SCRIPT_DIR/checksum"
+CHECKSUM_SOURCE="$SCRIPT_DIR/checksum.c"
 
-# Run checksum on input file
-echo "Running checksum on: $1"
-ls -l "$CHECKSUM_PATH"
+# Debugging: Print paths
+echo "Looking for checksum binary at: $CHECKSUM_PATH"
+echo "Looking for checksum.c at: $CHECKSUM_SOURCE"
 
-# If checksum.c exists, verify its checksum
-if [ -f "$CHECKSUM_SOURCE" ]; then
-    echo "Checksum on checksum.c:"
-    "$CHECKSUM_PATH" < "$CHECKSUM_SOURCE"
+# Check if checksum binary exists
+if [ -f "$CHECKSUM_PATH" ]; then
+    echo "Running checksum on: $1"
+    ls -l "$CHECKSUM_PATH"
+else
+    echo "ERROR: checksum binary not found at $CHECKSUM_PATH"
+    exit 1
 fi
 
-# Run checksum on input file
+# Verify checksum.c existence and readability
+if [ -f "$CHECKSUM_SOURCE" ]; then
+    if [ -r "$CHECKSUM_SOURCE" ]; then
+        echo "Checksum on checksum.c:"
+        "$CHECKSUM_PATH" < "$CHECKSUM_SOURCE"
+    else
+        echo "ERROR: checksum.c exists but is not readable."
+        exit 1
+    fi
+else
+    echo "WARNING: checksum.c not found, skipping checksum on source file."
+fi
+
+# Run md5sum on input file
 echo "md5sum on input file:"
 md5sum "$1" | sed "s|$1|$(basename "$1")|"
 
-# Count edges
+# Count edges (number of lines in input file)
 echo "Edges:"
 wc -l "$1" | sed "s|$1|$(basename "$1")|"
 
-# Count unique nodes
+# Count unique nodes (first and second column values)
 echo "Nodes:"
 awk '{print $1; print $2}' "$1" | sort -u | wc -l
 
