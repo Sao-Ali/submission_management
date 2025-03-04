@@ -53,5 +53,5 @@ This project is a **web-based interface** for uploading structured data files, p
 ### **🔹 Installation**
 1. **Clone the Repository**
    ```bash
-   git clone https://github.com/YOUR_GITHUB_USERNAME/YOUR_REPOSITORY.git
-   cd YOUR_REPOSITORY
+   git clone git@github.com:Sao-Ali/submission_management.git
+   cd submission_management
